@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
+import static java.util.stream.IntStream.rangeClosed;
+
 
 public class Day7 {
     private final int[] values;
@@ -22,18 +24,10 @@ public class Day7 {
     }
 
     private long calculate(BiFunction<Integer, Integer, Long> function) {
-        long min = Long.MAX_VALUE;
-        int max = Arrays.stream(values).max().getAsInt();
-
-        for(int i = 0; i <= max; i++) {
-            long sum = 0;
-            for(var item : values) {
-                sum += function.apply(i, item);
-            }
-            if(sum < min)
-                min = sum;
-        }
-        return min;
+        return rangeClosed(0, Arrays.stream(values).max().getAsInt())
+                .mapToLong(target -> Arrays.stream(values).
+                        mapToLong(i -> function.apply(target, i))
+                        .sum()).min().orElse(0);
     }
 
     private long recursiveAccumulate(long startValue) {
@@ -41,6 +35,4 @@ public class Day7 {
             return startValue + recursiveAccumulate(startValue-1);
         return 0;
     }
-
-
 }
